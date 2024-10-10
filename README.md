@@ -3,335 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Responsive Register and Typing Animation</title>
+    <title>Vintage Firewall Verification</title>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* Google Font */
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
-
-        * {
+        body, html {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            height: 100%;
+            font-family: 'Courier Prime', monospace;
+            background-color: #f4e9d8;
+            color: #2c2c2c;
         }
 
-        body {
-            font-family: 'Poppins', sans-serif;
+        .container {
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            color: #fff;
-            overflow: hidden;
+            background-image: 
+                linear-gradient(rgba(244, 233, 216, 0.8), rgba(244, 233, 216, 0.8)),
+                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23997e5b' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
 
-        .container {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-            max-width: 450px;
-            width: 100%;
+        .firewall-box {
+            background-color: #fff;
+            border: 2px solid #2c2c2c;
+            box-shadow: 8px 8px 0 #2c2c2c;
+            padding: 40px;
+            width: 340px;
             text-align: center;
             position: relative;
         }
 
-        h2 {
-            font-size: 2rem;
-            color: #2575fc;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
-        label {
-            display: block;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-            color: #333;
+        .status-message {
+            font-size: 16px;
+            margin-bottom: 30px;
         }
 
-        input[type="text"] {
-            width: 100%;
-            padding: 15px;
-            margin-bottom: 1rem;
-            border: none;
-            border-radius: 8px;
-            background: #f4f4f4;
-            font-size: 1rem;
-            transition: all 0.3s;
-            box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.1);
+        .loader {
+            width: 60px;
+            height: 60px;
+            border: 3px solid #2c2c2c;
+            border-top: 3px solid #f4e9d8;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 30px;
         }
 
-        input[type="text"]:focus {
-            background: #fff;
-            outline: none;
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1), 0 0 15px rgba(37, 117, 252, 0.5);
-        }
-
-        .cookies-info {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            margin-bottom: 1.5rem;
-        }
-
-        input[type="checkbox"] {
-            margin-right: 10px;
-            cursor: pointer;
-            accent-color: #2575fc;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-
-        .btn:hover:not(:disabled) {
-            box-shadow: 0 10px 30px rgba(37, 117, 252, 0.5);
-            transform: translateY(-3px);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        /* Typing Animation */
-        .welcome-message {
+        .success-message, .error-message {
             display: none;
-            font-size: 2.5rem; /* Memperbesar teks welcome */
-            font-weight: 700;
-            color: #fff;
-            border-right: 3px solid;
-            white-space: nowrap;
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+
+        .success-message {
+            color: #2e8b57;
+        }
+
+        .error-message {
+            color: #8b0000;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .typewriter {
             overflow: hidden;
-            width: 0;
-            margin-top: 20px;
-            word-wrap: break-word;
-            word-break: break-word;
-        }
-
-        /* Mulai Belajar Button */
-        .start-learning {
-            display: none;
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: #2575fc;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1.2rem;
-        }
-
-        .start-learning:hover {
-            background-color: #6a11cb;
+            border-right: .15em solid #2c2c2c;
+            white-space: nowrap;
+            margin: 0 auto;
+            letter-spacing: .15em;
+            animation: 
+                typing 3.5s steps(40, end),
+                blink-caret .75s step-end infinite;
         }
 
         @keyframes typing {
-            from { width: 0; }
-            to { width: 100%; }
+            from { width: 0 }
+            to { width: 100% }
         }
 
-        @keyframes blink {
-            50% { border-color: transparent; }
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #2c2c2c; }
         }
 
-        /* Responsif */
-        @media (max-width: 768px) {
-            .container {
-                padding: 1.5rem;
-            }
-
-            h2 {
-                font-size: 1.8rem;
-            }
-
-            .btn {
-                font-size: 0.9rem;
-            }
-
-            input[type="text"] {
-                font-size: 0.9rem;
-            }
-
-            .welcome-message {
-                font-size: 2rem;  /* Memperbesar juga di layar kecil */
-                width: 100%;  /* Pastikan teks selalu membungkus dengan baik */
-            }
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 1.2rem;
-            }
-
-            h2 {
-                font-size: 1.5rem;
-            }
-
-            .btn {
-                font-size: 0.8rem;
-            }
-
-            input[type="text"] {
-                font-size: 0.85rem;
-            }
-
-            .welcome-message {
-                font-size: 1.8rem;  /* Teks tetap besar meski di layar kecil */
-                width: 100%;  /* Teks akan menyesuaikan dengan ukuran layar */
-            }
-        }
-
-        /* Pop-up styles */
-        .popup {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            visibility: hidden;
-            opacity: 0;
-            transition: visibility 0s, opacity 0.5s;
-            z-index: 10;
-        }
-
-        .popup-content {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 10px;
-            text-align: center;
-            max-width: 400px;
-            width: 80%;
-            color: #333;
-        }
-
-        .popup-content h3 {
-            margin-bottom: 1rem;
-        }
-
-        .popup-content button {
-            padding: 10px 20px;
-            background-color: #2575fc;
-            color: white;
+        .btn {
+            background-color: #2c2c2c;
+            color: #f4e9d8;
             border: none;
-            border-radius: 5px;
+            padding: 10px 20px;
+            font-family: 'Courier Prime', monospace;
+            font-size: 16px;
             cursor: pointer;
-            font-size: 1rem;
+            transition: all 0.3s ease;
+            margin-top: 20px;
         }
 
-        .popup-content button:hover {
-            background-color: #6a11cb;
+        .btn:hover {
+            background-color: #f4e9d8;
+            color: #2c2c2c;
+            box-shadow: 3px 3px 0 #2c2c2c;
         }
 
-        .popup.show {
-            visibility: visible;
-            opacity: 1;
+        .vintage-corners::before,
+        .vintage-corners::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #2c2c2c;
+        }
+
+        .vintage-corners::before {
+            top: -5px;
+            left: -5px;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .vintage-corners::after {
+            bottom: -5px;
+            right: -5px;
+            border-left: none;
+            border-top: none;
         }
     </style>
 </head>
 <body>
-
-<!-- Pop-up -->
-<div class="popup" id="popup">
-    <div class="popup-content">
-        <h3>Halo Pengguna Baru!</h3>
-        <p>Mohon untuk mengisi registrasi dulu yah.</p>
-        <button id="closePopup">Oke</button>
-    </div>
-</div>
-
-<div class="container" id="formContainer">
-    <h2>Register Now</h2>
-    <form id="registerForm">
-        <label for="username">Username</label>
-        <input type="text" id="username" name="username" required placeholder="Enter your username...">
-        
-        <div class="cookies-info">
-            <input type="checkbox" id="acceptCookies">
-            <label for="acceptCookies">I accept the cookies policy</label>
+    <div class="container">
+        <div class="firewall-box vintage-corners">
+            <h1>Firewall Verification</h1>
+            <div class="loader"></div>
+            <p class="status-message typewriter">Initiating security protocols...</p>
+            <p class="success-message">✓ Access Granted</p>
+            <p class="error-message">✗ Access Denied</p>
+            <button class="btn" onclick="startVerification()" style="display:none;">Verify Again</button>
         </div>
+    </div>
 
-        <button type="submit" class="btn" id="registerButton" disabled>Register</button>
-    </form>
-</div>
+    <script>
+        function startVerification() {
+            const loader = document.querySelector('.loader');
+            const statusMessage = document.querySelector('.status-message');
+            const successMessage = document.querySelector('.success-message');
+            const errorMessage = document.querySelector('.error-message');
+            const verifyButton = document.querySelector('.btn');
 
-<!-- Welcome Message Section -->
-<div class="welcome-message" id="welcomeMessage"></div>
-<button class="start-learning" id="startLearningButton">Mulai Belajar</button>
+            loader.style.display = 'block';
+            statusMessage.style.display = 'block';
+            statusMessage.textContent = 'Initiating security protocols...';
+            successMessage.style.display = 'none';
+            errorMessage.style.display = 'none';
+            verifyButton.style.display = 'none';
 
-<script>
-    const acceptCookiesCheckbox = document.getElementById('acceptCookies');
-    const registerButton = document.getElementById('registerButton');
-    const registerForm = document.getElementById('registerForm');
-    const formContainer = document.getElementById('formContainer');
-    const welcomeMessage = document.getElementById('welcomeMessage');
-    const startLearningButton = document.getElementById('startLearningButton');
-    const popup = document.getElementById('popup');
-    const closePopup = document.getElementById('closePopup');
+            setTimeout(() => {
+                statusMessage.textContent = 'Analyzing user credentials...';
+            }, 2000);
 
-    // Show popup when page loads
-    window.onload = function() {
-        popup.classList.add('show');
-    }
+            setTimeout(() => {
+                statusMessage.textContent = 'Finalizing verification...';
+            }, 4000);
 
-    // Close popup when button is clicked
-    closePopup.addEventListener('click', function() {
-        popup.classList.remove('show');
-    });acceptCookiesCheckbox.addEventListener('change', function() {
-        registerButton.disabled = !acceptCookiesCheckbox.checked;
-    });
+            setTimeout(() => {
+                const isVerified = Math.random() < 0.7;
+                loader.style.display = 'none';
+                statusMessage.style.display = 'none';
 
-    registerForm.addEventListener('submit', function(event) {
-        event.preventDefault();  // Prevent form from submitting
-
-        // Ambil username dari input
-        const username = document.getElementById('username').value;
-
-        // Sembunyikan form setelah submit
-        formContainer.style.display = 'none';
-
-        // Tampilkan pesan selamat datang dengan efek ketik satu per satu
-        let text = `Halo ${username}, selamat datang di website kami yang didukung oleh Kemendikbud untuk membantu Anda belajar!`;
-        welcomeMessage.style.display = 'block';
-        welcomeMessage.style.whiteSpace = 'normal'; // Memungkinkan teks untuk membungkus
-        typeText(welcomeMessage, text, 0);
-    });
-
-    function typeText(element, text, index) {
-        if (index < text.length) {
-            element.textContent += text.charAt(index);
-            setTimeout(() => typeText(element, text, index + 1), 100); // Setiap huruf muncul per 100ms
-        } else {
-            // Tampilkan tombol "Mulai Belajar" setelah teks selesai diketik
-            startLearningButton.style.display = 'block';
+                if (isVerified) {
+                    successMessage.style.display = 'block';
+                    setTimeout(() => {
+                        window.location.href = 'kf.html';
+                    }, 2000);
+                } else {
+                    errorMessage.style.display = 'block';
+                    verifyButton.style.display = 'inline-block';
+                }
+            }, 6000);
         }
-    }
 
-    // Event listener untuk tombol "Mulai Belajar"
-    startLearningButton.addEventListener('click', function() {
-        window.location.href = 'video.html'; // Ganti '#' dengan URL halaman yang diinginkan
-    });
-</script>
-
+        // Start the verification process on page load
+        window.onload = startVerification;
+    </script>
 </body>
 </html>
