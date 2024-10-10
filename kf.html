@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kamus Filsafat Kehidupan Vintage</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,700;1,300;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Roboto+Slab:wght@300;400;700&display=swap');
+
+        :root {
+            --primary-color: #8B4513;
+            --secondary-color: #D2B48C;
+            --background-color: #F5E6D3;
+            --text-color: #4A4A4A;
+            --card-bg: #FAEBD7;
+            --highlight-color: #CD853F;
+            --accent-color: #A0522D;
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            line-height: 1.8;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: all 0.5s ease;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23d2b48c' fill-opacity='0.2' fill-rule='evenodd'/%3E%3C/svg%3E");
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 40px 20px;
+            position: relative;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary-color);
+            text-align: center;
+            font-size: 4em;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            position: relative;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h1::after {
+            content: "";
+            display: block;
+            width: 150px;
+            height: 3px;
+            background-color: var(--highlight-color);
+            margin: 20px auto;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            margin-bottom: 40px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .card::before {
+            content: """;
+            font-family: 'Playfair Display', serif;
+            font-size: 200px;
+            color: rgba(139, 69, 19, 0.1);
+            position: absolute;
+            top: -50px;
+            left: 10px;
+            z-index: 0;
+        }
+
+        .card:hover {
+            transform: translateY(-10px) rotate(1deg);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        }
+
+        #quote {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-style: italic;
+            text-align: center;
+            margin: 20px 0;
+            color: var(--primary-color);
+            transition: all 0.5s ease;
+            position: relative;
+            z-index: 1;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        #author {
+            font-weight: bold;
+            text-align: right;
+            color: var(--highlight-color);
+            font-size: 24px;
+            margin-top: 20px;
+            font-style: italic;
+        }
+
+        #explanation {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.6);
+            border-radius: 8px;
+            font-size: 18px;
+            line-height: 1.8;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        #explanation::before {
+            content: "🍂";
+            font-size: 24px;
+            position: absolute;
+            top: -12px;
+            left: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 10px 5px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 1;
+            }
+            20% {
+                transform: scale(25, 25);
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: scale(40, 40);
+            }
+        }
+
+        .btn:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+
+        .btn:hover {
+            background-color: var(--highlight-color);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 7px 20px rgba(0,0,0,0.3);
+        }
+
+        #controls {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        #favorites {
+            margin-top: 50px;
+        }
+
+        .favorite-quote {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            position: relative;
+            transition: all 0.3s ease;
+            border-left: 5px solid var(--highlight-color);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .favorite-quote:hover {
+            transform: translateX(10px) scale(1.02);
+            box-shadow: -7px 7px 20px rgba(0,0,0,0.15);
+        }
+
+        .remove-favorite {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            background: var(--highlight-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .remove-favorite:hover {
+            transform: rotate(90deg) scale(1.1);
+            background-color: var(--primary-color);
+        }
+
+        #search-container {
+            display: flex;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        #search-input {
+            flex-grow: 1;
+            padding: 15px 20px;
+            font-size: 18px;
+            border: 2px solid var(--primary-color);
+            border-radius: 30px;
+            outline: none;
+            transition: all 0.3s ease;
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        #search-input:focus {
+            box-shadow: 0 0 20px rgba(139, 69, 19, 0.4);
+            transform: scale(1.02);
+        }
+
+        #search-button {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        #search-button:hover {
+            background-color: var(--highlight-color);
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        #theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        #theme-toggle:hover {
+            transform: rotate(180deg) scale(1.1);
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+        }
+
+        .dark-mode {
+            --primary-color: #D2B48C;
+            --secondary-color: #8B4513;
+            --background-color: #2C2C2C;
+            --text-color: #F5E6D3;
+            --card-bg: #3C3C3C;
+            --highlight-color: #CD853F;
+        }
+
+        #categories {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .category-btn {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .category-btn:hover, .category-btn.active {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        #quote-rating {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .star {
+            color: #FFD700;
+            font-size: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 5px;
+        }
+
+        .star:hover {
+            transform: scale(1.2) rotate(15deg);
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+        }
+
+        #quote-image {
+            width: 100%;
+            height: 300px;
+            background-size: cover;
+            background-position: center;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        #quote-image:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+
+        #related-quotes {
+            margin-top: 40px;
+        }
+
+        .related-quote {
+            background-color: rgba(255, 255, 255, 0.6);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            font-style: italic;
+            position: relative;
+            padding-left: 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .related-quote:hover {
+            transform: translateX(10px) scale(1.02);
+            box-shadow: -5px 5px 20px rgba(0,0,0,0.15);
+        }
+
+        .related-quote::before {
+            content: "❝";
+            position: absolute;
+            left: 10px;
+            top: 5px;
+            font-size: 24px;
+            color: var(--highlight-color);
+        }
+
+        #quote-of-the-day {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        #quote-of-the-day:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+
+        #quote-of-the-day h2 {
+            font-family: 'Playfair Display', serif;
+            margin-bottom: 10px;
+        }
+
+        #visualization-container {
+            width: 100%;
+            height: 300px;
+            margin-top: 40px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 10px;
+            }
+            #quote {
+                font-size: 24px;
+            }
+            .btn {
+                width: 100%;
+                margin: 10px 0;
+            }
+            #categories {
+                flex-direction: column;
+            }
+            .category-btn {
+                width: 100%;
+                margin: 5px 0;
+            }
+            #quote-image {
+                height: 200px;
+            }
+        }
+
+        /* Animations */
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .float {
+            animation: float 6s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="animate__animated animate__fadeInDown float">Kamus Filsafat Kehidupan Vintage</h1>
+        <div id="search-container" class="animate__animated animate__fadeInLeft">
+            <input type="text" id="search-input" placeholder="Cari kutipan, filsuf, atau kata kunci...">
+            <button id="search-button"><i class="fas fa-search"></i></button>
+        </div>
+        <div id="categories" class="animate__animated animate__fadeInRight">
+            <button class="category-btn active" data-category="all">Semua</button>
+            <button class="category-btn" data-category="ethics">Etika</button>
+            <button class="category-btn" data-category="metaphysics">Metafisika</button>
+            <button class="category-btn" data-category="epistemology">Epistemologi</button>
+            <button class="category-btn" data-category="logic">Logika</button>
+        </div>
+        <div id="quote-of-the-day" class="animate__animated animate__zoomIn">
+            <h2>Kutipan Hari Ini</h2>
+            <p id="daily-quote"></p>
+            <p id="daily-author"></p>
+        </div>
+        <div id="quote-container" class="card animate__animated animate__zoomIn">
+            <div id="quote-image"></div>
+            <div id="quote"></div>
+            <div id="author"></div>
+            <div id="explanation"></div>
+            <div id="quote-rating">
+                <i class="star fas fa-star" data-rating="1"></i>
+                <i class="star fas fa-star" data-rating="2"></i>
+                <i class="star fas fa-star" data-rating="3"></i>
+                <i class="star fas fa-star" data-rating="4"></i>
+                <i class="star fas fa-star" data-rating="5"></i>
+            </div>
+        </div>
+        <div id="controls">
+            <button class="btn animate__animated animate__bounceIn" onclick="generateQuote()">Kutipan Baru</button>
+            <button class="btn animate__animated animate__bounceIn" onclick="addToFavorites()">Tambah ke Favorit</button>
+            <button class="btn animate__animated animate__bounceIn" onclick="shareQuote()">Bagikan</button>
+        </div>
+        <div id="related-quotes">
+            <h2>Kutipan Terkait</h2>
+            <div id="related-quotes-list"></div>
+        </div>
+        <div id="visualization-container"></div>
+        <div id="favorites" class="card">
+            <h2>Kutipan Favorit</h2>
+            <div id="favorites-list"></div>
+        </div>
+    </div>
+    <button id="theme-toggle"><i class="fas fa-moon"></i></button>
+
+    <script>
+        const quotes = [
+            { 
+                text: "Kenali dirimu sendiri.", 
+                author: "Socrates",
+                explanation: "Kutipan ini menekankan pentingnya introspeksi dan pemahaman diri. Dengan mengenali kekuatan, kelemahan, dan motivasi kita sendiri, kita dapat membuat keputusan yang lebih baik dan hidup lebih otentik.",
+                category: "ethics",
+                image: "https://deposit.pictures/p/db85720b2169418bb84fa3c947ffcd87"
+            },
+            { 
+                text: "Pikiran yang telah diperluas oleh ide baru tidak akan pernah kembali ke ukuran semula.", 
+                author: "Oliver Wendell Holmes",
+                explanation: "Kutipan ini menggambarkan kekuatan transformatif dari pengetahuan dan pengalaman baru. Setelah kita mempelajari atau mengalami sesuatu yang baru, perspektif kita berubah secara permanen, mendorong pertumbuhan pribadi.",
+                category: "epistemology",
+                image: "https://source.unsplash.com/featured/?mind,growth"
+            },
+            { 
+                text: "Hidup yang tidak direnungkan tidak layak untuk dijalani.", 
+                author: "Socrates",
+                explanation: "Socrates menekankan pentingnya refleksi dan pemikiran kritis dalam hidup. Tanpa memikirkan tindakan dan keputusan kita, kita mungkin hanya menjalani hidup secara dangkal tanpa tujuan atau makna yang lebih dalam.",
+                category: "ethics",
+                image: "https://source.unsplash.com/featured/?reflection,life"
+            },
+            { 
+                text: "Kebahagiaan tergantung pada diri kita sendiri.", 
+                author: "Aristoteles",
+                explanation: "Aristoteles menyarankan bahwa kebahagiaan bukan sesuatu yang datang dari luar, tetapi sesuatu yang kita ciptakan sendiri melalui pilihan dan tindakan kita. Ini mendorong kita untuk mengambil tanggung jawab atas kebahagiaan kita sendiri.",
+                category: "ethics",
+                image: "https://source.unsplash.com/featured/?happiness,choice"
+            },
+            { 
+                text: "Kita adalah apa yang kita pikirkan.", 
+                author: "Buddha",
+                explanation: "Buddha mengajarkan bahwa pikiran kita membentuk realitas kita. Cara kita berpikir mempengaruhi perasaan, tindakan, dan pada akhirnya, siapa kita. Ini menekankan pentingnya pemikiran positif dan sadar.",
+                category: "metaphysics",
+                image: "https://source.unsplash.com/featured/?mindfulness,buddha"
+            },
+            // ... (tambahkan lebih banyak kutipan di sini)
+        ];
+
+        let currentQuote;
+        let currentCategory = 'all';
+
+        function generateQuote(category = currentCategory) {
+            let filteredQuotes = category === 'all' ? quotes : quotes.filter(q => q.category === category);
+            const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
+            currentQuote = filteredQuotes[randomIndex];
+            
+            const quoteElement = document.getElementById('quote');
+            const authorElement = document.getElementById('author');
+            const explanationElement = document.getElementById('explanation');
+            const imageElement = document.getElementById('quote-image');
+            
+            quoteElement.style.opacity = 0;
+            authorElement.style.opacity = 0;
+            explanationElement.style.opacity = 0;
+            imageElement.style.opacity = 0;
+            
+            setTimeout(() => {
+                quoteElement.textContent = `"${currentQuote.text}"`;
+                authorElement.textContent = `- ${currentQuote.author}`;
+                explanationElement.textContent = currentQuote.explanation;
+                imageElement.style.backgroundImage = `url(${currentQuote.image})`;
+                
+                quoteElement.style.opacity = 1;
+                authorElement.style.opacity = 1;
+                explanationElement.style.opacity = 1;
+                imageElement.style.opacity = 1;
+            }, 500);
+
+            resetRating();
+            generateRelatedQuotes();
+            updateVisualization();
+        }
+
+        function addToFavorites() {
+            if (currentQuote) {
+                const favoritesList = document.getElementById('favorites-list');
+                const favoriteQuote = document.createElement('div');
+                favoriteQuote.className = 'favorite-quote animate__animated animate__fadeIn';
+                favoriteQuote.innerHTML = `
+                    <strong>"${currentQuote.text}"</strong> - ${currentQuote.author}
+                    <button class="remove-favorite" onclick="removeFavorite(this)">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                favoritesList.appendChild(favoriteQuote);
+                saveFavorites();
+            }
+        }
+
+        function removeFavorite(button) {
+            const favoriteQuote = button.parentElement;
+            favoriteQuote.classList.add('animate__fadeOut');
+            setTimeout(() => {
+                favoriteQuote.remove();
+                saveFavorites();
+            }, 500);
+        }
+
+        function shareQuote() {
+            if (currentQuote) {
+                const shareText = `"${currentQuote.text}" - ${currentQuote.author}`;
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'Kutipan Filosofis',
+                        text: shareText,
+                    }).then(() => {
+                        console.log('Berhasil membagikan');
+                    }).catch((error) => {
+                        console.log('Gagal membagikan', error);
+                    });
+                } else {
+                    alert("Maaf, fitur berbagi tidak didukung di perangkat ini. Kutipan: " + shareText);
+                }
+            }
+        }
+
+        function saveFavorites() {
+            const favorites = Array.from(document.querySelectorAll('.favorite-quote')).map(quote => quote.textContent.trim());
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+        }
+
+        function loadFavorites() {
+            const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+            const favoritesList = document.getElementById('favorites-list');
+            favorites.forEach(favorite => {
+                const favoriteQuote = document.createElement('div');
+                favoriteQuote.className = 'favorite-quote';
+                favoriteQuote.innerHTML = `
+                    ${favorite}
+                    <button class="remove-favorite" onclick="removeFavorite(this)">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                favoritesList.appendChild(favoriteQuote);
+            });
+        }
+
+        function resetRating() {
+            const stars = document.querySelectorAll('.star');
+            stars.forEach(star => star.classList.remove('fas', 'far'));
+            stars.forEach(star => star.classList.add('far'));
+        }
+
+        function generateRelatedQuotes() {
+            const relatedQuotesList = document.getElementById('related-quotes-list');
+            relatedQuotesList.innerHTML = '';
+            const relatedQuotes = quotes.filter(quote => 
+                quote.category === currentQuote.category && quote !== currentQuote
+            ).slice(0, 3);
+
+            relatedQuotes.forEach(quote => {
+                const relatedQuote = document.createElement('div');
+                relatedQuote.className = 'related-quote animate__animated animate__fadeIn';
+                relatedQuote.textContent = `"${quote.text}" - ${quote.author}`;
+                relatedQuotesList.appendChild(relatedQuote);
+            });
+        }
+
+        function updateVisualization() {
+            const container = document.getElementById('visualization-container');
+            container.innerHTML = '';
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
+
+            const geometry = new THREE.SphereGeometry(5, 32, 32);
+            const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
+            const sphere = new THREE.Mesh(geometry, material);
+            scene.add(sphere);
+
+            camera.position.z = 10;
+
+            function animate() {
+                requestAnimationFrame(animate);
+                sphere.rotation.x += 0.01;
+                sphere.rotation.y += 0.01;
+                renderer.render(scene, camera);
+            }
+            animate();
+        }
+
+        document.getElementById('search-button').addEventListener('click', () => {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const foundQuote = quotes.find(quote => 
+                quote.text.toLowerCase().includes(searchTerm) || 
+                quote.author.toLowerCase().includes(searchTerm)
+            );
+            if (foundQuote) {
+                currentQuote = foundQuote;
+                document.getElementById('quote').textContent = `"${foundQuote.text}"`;
+                document.getElementById('author').textContent = `- ${foundQuote.author}`;
+                document.getElementById('explanation').textContent = foundQuote.explanation;
+                document.getElementById('quote-image').style.backgroundImage = `url(${foundQuote.image})`;
+                resetRating();
+                generateRelatedQuotes();
+                updateVisualization();
+            } else {
+                alert('Kutipan tidak ditemukan. Coba kata kunci lain.');
+            }
+        });
+
+        document.querySelectorAll('.category-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                currentCategory = button.dataset.category;
+                generateQuote(currentCategory);
+            });
+        });
+
+        document.querySelectorAll('.star').forEach(star => {
+            star.addEventListener('click', () => {
+                const rating = parseInt(star.dataset.rating);
+                document.querySelectorAll('.star').forEach(s => {
+                    if (parseInt(s.dataset.rating) <= rating) {
+                        s.classList.remove('far');
+                        s.classList.add('fas');
+                    } else {
+                        s.classList.remove('fas');
+                        s.classList.add('far');
+                    }
+                });
+            });
+        });
+
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const themeIcon = document.querySelector('#theme-toggle i');
+            themeIcon.classList.toggle('fa-moon');
+            themeIcon.classList.toggle('fa-sun');
+        });
+
+        function setDailyQuote() {
+            const today = new Date().toDateString();
+            const storedDate = localStorage.getItem('dailyQuoteDate');
+            if (storedDate !== today) {
+                const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+                document.getElementById('daily-quote').textContent = `"${randomQuote.text}"`;
+                document.getElementById('daily-author').textContent = `- ${randomQuote.author}`;
+                localStorage.setItem('dailyQuoteDate', today);
+                localStorage.setItem('dailyQuote', JSON.stringify(randomQuote));
+            } else {
+                const dailyQuote = JSON.parse(localStorage.getItem('dailyQuote'));
+                document.getElementById('daily-quote').textContent = `"${dailyQuote.text}"`;
+                document.getElementById('daily-author').textContent = `- ${dailyQuote.author}`;
+            }
+        }
+
+        window.addEventListener('load', () => {
+            generateQuote();
+            loadFavorites();
+            setDailyQuote();
+        });
+
+        window.addEventListener('resize', updateVisualization);
+    </script>
+</body>
+</html>
