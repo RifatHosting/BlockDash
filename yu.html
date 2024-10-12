@@ -183,7 +183,7 @@
                 if (isVerified) {
                     successMessage.style.display = 'block';
                     setTimeout(() => {
-                        window.location.href = 'kf.html';
+                        window.location.href = 'ss.html';
                     }, 2000);
                 } else {
                     errorMessage.style.display = 'block';
