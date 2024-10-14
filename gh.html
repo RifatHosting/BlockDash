@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Enhanced Block Dash Mobile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #000;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #gameContainer {
+            position: relative;
+            width: 100%;
+            height: 80vh;
+            max-width: 500px;
+        }
+        #gameCanvas {
+            width: 100%;
+            height: 100%;
+            border: 3px solid #ff00ff;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.5);
+        }
+        #ui {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #fff;
+            font-size: 18px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        #controls {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 500px;
+            margin-top: 20px;
+        }
+        .control-btn {
+            width: 70px;
+            height: 70px;
+            background-color: rgba(255, 0, 255, 0.7);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            touch-action: manipulation;
+            transition: all 0.3s ease;
+        }
+        .control-btn:active {
+            transform: scale(0.95);
+            background-color: rgba(255, 0, 255, 0.9);
+        }
+        #powerUpBtn {
+            background-color: rgba(255, 215, 0, 0.7);
+        }
+        #startScreen, #gameOverScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.9);
+            border-radius: 15px;
+        }
+        h1 {
+            color: #ff00ff;
+            font-size: 36px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 24px;
+            background-color: #ff00ff;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        button:hover, button:active {
+            background-color: #ff6bff;
+            transform: scale(1.05);
+        }
+        #instructions {
+            color: #fff;
+            font-size: 16px;
+            margin-top: 20px;
+            text-align: center;
+            padding: 0 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        <div id="ui">
+            <div id="scoreDisplay">Score: 0</div>
+            <div id="livesDisplay">Lives: 3</div>
+        </div>
+        <div id="startScreen">
+            <h1>Enhanced Block Dash</h1>
+            <button id="startButton">Start Game</button>
+            <div id="instructions">
+                Tap left/right to move<br>
+                Tap the gold button to use power-up
+            </div>
+        </div>
+        <div id="gameOverScreen" style="display: none;">
+            <h1>Game Over</h1>
+            <div id="finalScore">Final Score: 0</div>
+            <button id="restartButton">Play Again</button>
+        </div>
+    </div>
+    <div id="controls">
+        <button id="leftBtn" class="control-btn">←</button>
+        <button id="powerUpBtn" class="control-btn">↑</button>
+        <button id="rightBtn" class="control-btn">→</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const livesDisplay = document.getElementById('livesDisplay');
+        const startScreen = document.getElementById('startScreen');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const startButton = document.getElementById('startButton');
+        const restartButton = document.getElementById('restartButton');
+        const finalScoreDisplay = document.getElementById('finalScore');
+        const leftBtn = document.getElementById('leftBtn');
+        const rightBtn = document.getElementById('rightBtn');
+        const powerUpBtn = document.getElementById('powerUpBtn');
+
+        // Set canvas size
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+
+        let playerX = canvas.width / 2;
+        const playerY = canvas.height - 50;
+        const playerWidth = canvas.width * 0.15;
+        const playerHeight = canvas.height * 0.05;
+
+        let obstacles = [];
+        let powerUps = [];
+        let particles = [];
+        let stars = [];
+        let score = 0;
+        let isGameRunning = false;
+        let lives = 3;
+        let isInvincible = false;
+        let hasPowerUp = false;
+
+        const colors = {
+            player: '#ff00ff',
+            obstacle: '#00ffff',
+            powerUp: '#ffd700',
+            invincible: '#ff00ff'
+        };
+
+        // Create initial stars
+        for (let i = 0; i < 100; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 1.5,
+                speed: Math.random() * 0.5 + 0.1
+            });
+        }
+
+        function drawPlayer() {
+            ctx.fillStyle = isInvincible ? colors.invincible : colors.player;
+            ctx.beginPath();
+            ctx.moveTo(playerX, playerY);
+            ctx.lineTo(playerX + playerWidth, playerY);
+            ctx.lineTo(playerX + playerWidth / 2, playerY - playerHeight);
+            ctx.closePath();
+            ctx.fill();
+
+            // Draw player glow
+            ctx.shadowColor = isInvincible ? colors.invincible : colors.player;
+            ctx.shadowBlur = 20;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            if (hasPowerUp) {
+                ctx.fillStyle = colors.powerUp;
+                ctx.beginPath();
+                ctx.arc(playerX + playerWidth / 2, playerY - playerHeight - 10, 5, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Draw power-up glow
+                ctx.shadowColor = colors.powerUp;
+                ctx.shadowBlur = 10;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        function drawObstacles() {
+            obstacles.forEach(obstacle => {
+                ctx.fillStyle = obstacle.color;
+                ctx.beginPath();
+                ctx.moveTo(obstacle.x, obstacle.y);
+                ctx.lineTo(obstacle.x + obstacle.width, obstacle.y);
+                ctx.lineTo(obstacle.x + obstacle.width / 2, obstacle.y + obstacle.height);
+                ctx.closePath();
+                ctx.fill();
+
+                // Draw obstacle glow
+                ctx.shadowColor = obstacle.color;
+                ctx.shadowBlur = 10;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            });
+        }
+
+        function drawPowerUps() {
+            powerUps.forEach(powerUp => {
+                ctx.fillStyle = colors.powerUp;
+                ctx.beginPath();
+                ctx.arc(powerUp.x, powerUp.y, powerUp.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Draw power-up glow
+                ctx.shadowColor = colors.powerUp;
+                ctx.shadowBlur = 15;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            });
+        }
+
+        function updateObstacles() {
+            obstacles.forEach(obstacle => {
+                obstacle.y += obstacle.speed;
+            });
+
+            if (Math.random() < 0.03) {
+                obstacles.push({
+                    x: Math.random() * (canvas.width - canvas.width * 0.1),
+                    y: 0,
+                    width: canvas.width * 0.1,
+                    height: canvas.height * 0.05,
+                    speed: (Math.random() * 2 + 2) * canvas.height / 600,
+                    color: `hsl(${Math.random() * 360}, 100%, 50%)`
+                });
+            }
+
+            obstacles = obstacles.filter(obstacle => obstacle.y < canvas.height);
+        }
+
+        function updatePowerUps() {
+            powerUps.forEach(powerUp => {
+                powerUp.y += canvas.height / 600;
+            });
+
+            if (Math.random() < 0.005) {
+                powerUps.push({
+                    x: Math.random() * canvas.width,
+                    y: 0,
+                    radius: canvas.width * 0.02
+                });
+            }
+
+            powerUps = powerUps.filter(powerUp => powerUp.y < canvas.height);
+        }
+
+        function checkCollision() {
+            obstacles.forEach((obstacle, index) => {
+                if (
+                    playerX < obstacle.x + obstacle.width &&
+                    playerX + playerWidth > obstacle.x &&
+                    playerY < obstacle.y + obstacle.height &&
+                    playerY + playerHeight > obstacle.y
+                ) {
+                    if (isInvincible) {
+                        createExplosion(obstacle.x + obstacle.width / 2, obstacle.y + obstacle.height / 2, obstacle.color);
+                        obstacles.splice(index, 1);
+                        score += 10;
+                    } else {
+                        lives--;
+                        createExplosion(playerX + playerWidth / 2, playerY - playerHeight / 2, colors.player);
+                        obstacles.splice(index, 1);
+                        if (lives <= 0) {
+                            endGame();
+                        } else {
+                            activateInvincibility();
+                        }
+                    }
+                }
+            });
+
+            powerUps.forEach((powerUp, index) => {
+                const dx = playerX + playerWidth / 2 - powerUp.x;
+                const dy = playerY - powerUp.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < powerUp.radius + playerHeight) {
+                    createExplosion(powerUp.x, powerUp.y, colors.powerUp);
+                    powerUps.splice(index, 1);
+                    hasPowerUp = true;
+                }
+            });
+        }
+
+        function activateInvincibility() {
+            isInvincible = true;
+            setTimeout(() => {
+                isInvincible = false;
+            }, 3000);
+        }
+
+        function updateScore() {
+            score++;
+            scoreDisplay.textContent = `Score: ${score}`;
+            livesDisplay.textContent = `Lives: ${lives}`;
+        }
+
+        function drawBackground() {
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw and update stars
+            ctx.fillStyle = 'white';
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                star.y += star.speed;
+                if (star.y > canvas.height) {
+                    star.y = 0;
+                    star.x = Math.random() * canvas.width;
+                }
+            });
+        }
+
+        function createExplosion(x, y, color) {
+            for (let i = 0; i < 20; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    radius: Math.random() * 3 + 1,
+                    color: color,
+                    speed: Math.random() * 3 + 1,
+                    angle: Math.random() * Math.PI * 2,
+                    friction: 0.95,
+                    opacity: 1
+                });
+            }
+        }
+
+        function updateParticles() {
+            particles.forEach((particle, index) => {
+                particle.x += Math.cos(particle.angle) * particle.speed;
+                particle.y += Math.sin(particle.angle) * particle.speed;
+                particle.speed *= particle.friction;
+                particle.opacity -= 0.01;
+
+                if (particle.opacity <= 0) {
+                    particles.splice(index, 1);
+                }
+            });
+        }
+
+        function drawParticles() {
+            particles.forEach(particle => {
+                ctx.beginPath();
+                ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${hexToRgb(particle.color)}, ${particle.opacity})`;
+                ctx.fill();
+            });
+        }
+
+        function hexToRgb(hex) {
+            const bigint = parseInt(hex.slice(1), 16);
+            const r = (bigint >> 16) & 255;
+            const g = (bigint >> 8) & 255;
+            const b = bigint & 255;
+            return `${r}, ${g}, ${b}`;
+        }
+
+        function gameLoop() {
+            if (!isGameRunning) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBackground();
+            drawPlayer();
+            drawObstacles();
+            drawPowerUps();
+            updateObstacles();
+            updatePowerUps();
+            checkCollision();
+            updateScore();
+            updateParticles();
+            drawParticles();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function startGame() {
+            isGameRunning = true;
+            lives = 3;
+            score = 0;
+            obstacles = [];
+            powerUps = [];
+            particles = [];
+            startScreen.style.display = 'none';
+            gameOverScreen.style.display = 'none';
+            gameLoop();
+        }
+
+        function endGame() {
+            isGameRunning = false;
+            gameOverScreen.style.display = 'flex';
+            finalScoreDisplay.textContent = `Final Score: ${score}`;
+        }
+
+        startButton.addEventListener('click', startGame);
+        restartButton.addEventListener('click', startGame);
+
+        // Touch controls
+        leftBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            playerX = Math.max(0, playerX - canvas.width * 0.05);
+        });
+
+        rightBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            playerX = Math.min(canvas.width - playerWidth, playerX + canvas.width * 0.05);
+        });
+
+        powerUpBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (hasPowerUp) {
+                activateInvincibility();
+                hasPowerUp = false;
+                createExplosion(playerX + playerWidth / 2, playerY - playerHeight / 2, colors.powerUp);
+            }
+        });
+
+        // Prevent default touch behavior
+        document.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            playerX = canvas.width / 2;
+            playerWidth = canvas.width * 0.15;
+            playerHeight = canvas.height * 0.05;
+
+            // Recreate stars for new canvas size
+            stars = [];
+            for (let i = 0; i < 100; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 1.5,
+                    speed: Math.random() * 0.5 + 0.1
+                });
+            }
+        });
+
+        // Add smooth player movement
+        let targetPlayerX = playerX;
+        const playerSpeed = 0.1;
+
+        function updatePlayerPosition() {
+            const dx = targetPlayerX - playerX;
+            playerX += dx * playerSpeed;
+        }
+
+        // Update game loop to include smooth player movement
+        function gameLoop() {
+            if (!isGameRunning) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBackground();
+            updatePlayerPosition();
+            drawPlayer();
+            drawObstacles();
+            drawPowerUps();
+            updateObstacles();
+            updatePowerUps();
+            checkCollision();
+            updateScore();
+            updateParticles();
+            drawParticles();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Update touch controls for smooth movement
+        leftBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            targetPlayerX = Math.max(0, playerX - canvas.width * 0.2);
+        });
+
+        rightBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            targetPlayerX = Math.min(canvas.width - playerWidth, playerX + canvas.width * 0.2);
+        });
+
+        // Add continuous movement while touching buttons
+        function continuousMove() {
+            if (leftBtn.matches(':active')) {
+                targetPlayerX = Math.max(0, targetPlayerX - canvas.width * 0.01);
+            }
+            if (rightBtn.matches(':active')) {
+                targetPlayerX = Math.min(canvas.width - playerWidth, targetPlayerX + canvas.width * 0.01);
+            }
+            requestAnimationFrame(continuousMove);
+        }
+        continuousMove();
+
+        // Add particle trail to player
+        function createPlayerTrail() {
+            if (isGameRunning) {
+                particles.push({
+                    x: playerX + playerWidth / 2,
+                    y: playerY,
+                    radius: Math.random() * 2 + 1,
+                    color: isInvincible ? colors.invincible : colors.player,
+                    speed: Math.random() * 1 + 0.5,
+                    angle: Math.PI * 1.5 + (Math.random() - 0.5) * 0.5,
+                    friction: 0.99,
+                    opacity: 0.7
+                });
+                setTimeout(createPlayerTrail, 50);
+            }
+        }
+        createPlayerTrail();
+
+        // Start the game
+        startButton.click();
+    </script>
+</body>
+</html>
