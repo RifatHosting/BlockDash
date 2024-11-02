@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Music Player</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #333333;
+            --bg-light: #ffffff;
+            --bg-lighter: #f5f5f5;
+            --card-bg: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+        }
+
+        body, html {
+            height: 100%;
+            background: var(--bg-light);
+            overflow: hidden;
+            touch-action: none;
+            color: var(--text-primary);
+        }
+
+        #app-container {
+            max-width: 480px;
+            height: 100vh;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(145deg, #f3f4f6 0%, #ffffff 100%);
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .playlist-overlay {
+            background: var(--bg-light);
+            transform: translateY(100%);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .playlist-overlay.active {
+            transform: translateY(0);
+        }
+
+        .progress-bar {
+            background: rgba(0,0,0,0.08);
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .progress {
+            background: linear-gradient(90deg, #333333, #666666);
+            height: 100%;
+            width: 0%;
+            border-radius: 3px;
+            transition: width 0.1s linear;
+            position: relative;
+        }
+
+        .progress::after {
+            content: '';
+            position: absolute;
+            right: -4px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            background: #333333;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .progress-bar:hover .progress::after {
+            opacity: 1;
+        }
+
+        .music-btn {
+            background: rgba(0,0,0,0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .music-btn:hover {
+            background: rgba(0,0,0,0.1);
+            transform: scale(1.1);
+        }
+
+        .playlist-item {
+            transition: all 0.3s ease;
+            background: rgba(0,0,0,0.02);
+            border-radius: 12px;
+            margin-bottom: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .playlist-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: #333333;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .playlist-item.currently-playing::before {
+            opacity: 1;
+        }
+
+        .playlist-item:hover {
+            background: rgba(0,0,0,0.05);
+            transform: translateX(8px);
+        }
+
+        .album-rotation {
+            animation: rotate 20s linear infinite;
+            animation-play-state: paused;
+        }
+
+        .album-rotation.playing {
+            animation-play-state: running;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .volume-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(0,0,0,0.08);
+            outline: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #333333;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .volume-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .playlist-handle {
+            width: 40px;
+            height: 4px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 2px;
+            margin: 0 auto;
+        }
+
+        .album-art-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto;
+        }
+
+        .album-art-shadow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            z-index: -1;
+        }
+
+        #album-cover {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+
+        .wave-animation {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 2px;
+        }
+
+        .wave-bar {
+            width: 4px;
+            background: #333333;
+            border-radius: 2px;
+            transition: height 0.2s;
+        }
+    </style>
+</head>
+<body>
+    <div id="app-container">
+        <!-- Main Player View -->
+        <div id="player-view" class="flex flex-col h-full p-6 pb-12">
+            <!-- Top Bar -->
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-2xl font-bold tracking-tight">Now Playing</h2>
+                <button id="settings-btn" class="p-2 rounded-full hover:bg-black/5 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Album Art -->
+            <div class="flex-grow flex items-center justify-center mb-8">
+                <div class="album-art-container">
+                    <div class="album-art-shadow"></div>
+                    <img id="album-cover" class="album-rotation" src="/api/placeholder/300/300" alt="Album Cover">
+                </div>
+            </div>
+
+            <!-- Track Info -->
+            <div class="text-center mb-8">
+                <h3 class="text-2xl font-bold mb-2 tracking-tight">Mean it</h3>
+                <p class="text-gray-600">LANY</p>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="mb-6">
+                <div class="progress-bar">
+                    <div class="progress"></div>
+                </div>
+                <div class="flex justify-between text-sm text-gray-500 mt-2">
+                    <span>0:00</span>
+                    <span>3:30</span>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="flex justify-center items-center space-x-8">
+                <button class="music-btn p-3 rounded-full previous-track">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 20L9 12l10-8v16z"/>
+                        <line x1="5" y1="19" x2="5" y2="5"/>
+                    </svg>
+                </button>
+                <button id="play-pause" class="music-btn bg-black text-white rounded-full p-4 hover:bg-black/90">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="white">
+                        <path d="M8 5v14l11-7z"/>
+                    </svg>
+                </button>
+                <button class="music-btn p-3 rounded-full next-track">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 4l10 8-10 8V4z"/>
+                        <line x1="19" y1="5" x2="19" y2="19"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Wave Animation -->
+            <div class="wave-animation">
+                <div class="wave-bar h-2"></div>
+                <div class="wave-bar h-4"></div>
+                <div class="wave-bar h-8"></div>
+                <div class="wave-bar h-4"></div>
+                <div class="wave-bar h-2"></div>
+            </div>
+
+            <!-- Swipe Indicator -->
+            <div class="absolute bottom-0 left-0 right-0 p-4 text-center">
+                <div class="playlist-handle mb-2"></div>
+                <span class="text-sm text-gray-500">Swipe up for playlist</span>
+            </div>
+        </div>
+
+        <!-- Playlist Overlay -->
+        <div id="playlist-overlay" class="playlist-overlay fixed inset-0 z-50">
+            <div class="h-full glass-effect p-6">
+                <div class="playlist-handle mb-6"></div>
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-xl font-bold">Current Playlist</h2>
+                    <button id="close-playlist" class="p-2 rounded-full hover:bg-black/5">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div class="space-y-2" id="playlist-items">
+                    <!-- Playlist items will be dynamically populated -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Overlay -->
+        <div id="settings-overlay" class="playlist-overlay fixed inset-0 z-50">
+            <div class="absolute bottom-0 w-full glass-effect rounded-t-3xl p-6">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-xl font-bold">Settings</h2>
+                    <button id="close-settings" class="p-2 rounded-full hover:bg-black/5">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div class="space-y-6">
+                    <div>
+                        <label class="text-sm text-gray-600 mb-2 block">Volume</label>
+                        <input type="range" class="volume-slider" min="0" max="100" value="70">
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-600 mb-2 block">Equalizer Preset</label>
+                        <select class="w-full bg-black/5 rounded-lg p-3 outline-none">
+                            <option>Normal</option>
+                            <option>Rock</option>
+                            <option>Pop</option>
+                            <option>Jazz</option>
+                            <option>Classical</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-600 mb-2 block">Crossfade</label>
+                        <input type="range" class="volume-slider" min="0" max="12" value="0">
+                        <div class="text-xs text-gray-500 mt-1">0s</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Playlist data
+        const playlist = [
+            {
+                title: "Mean it",
+                artist: "LANY",
+                duration: "3:52",
+                cover: "MNT.JPG",
+                audio: "Mean It.mp3"
+            },
+            {
+                title: "Malibu Nights",
+                artist: "LANY",
+                duration: "4:47",
+                cover: "MAL.JPG",
+                audio: "Malibu Nights.mp3"
+            },
+            {
+                title: "Cause You To Have",
+                artist: "LANY",
+                duration: "4:11",
+                cover: "CAUT.jpg",
+                audio: "Cause You Have To.mp3"
+            },
+            {
+                title: "13",
+                artist: "LANY",
+                duration: "3:50",
+                cover: "smili.jpg",
+                audio: "13.mp3"
+            },
+            {
+                title: "ILYSB",
+                artist: "LANY",
+                duration: "3:35",
+                cover: "smili.jpg",
+                audio: "ILYSB.mp3"
+            },
+            {
+                //tambah lagu bisa
+            }
+        ];
+
+        let currentTrackIndex = 0;
+        let isPlaying = false;
+
+        // DOM Elements
+        const playPauseBtn = document.getElementById('play-pause');
+        const albumCover = document.getElementById('album-cover');
+        const progressBar = document.querySelector('.progress');
+        const currentTimeEl = document.querySelector('.progress-bar + div span:first-child');
+        const durationEl = document.querySelector('.progress-bar + div span:last-child');
+        const titleEl = document.querySelector('#player-view h3');
+        const artistEl = document.querySelector('#player-view p');
+        const playlistContainer = document.getElementById('playlist-items');
+        const prevButton = document.querySelector('.previous-track');
+        const nextButton = document.querySelector('.next-track');
+        const waveBars = document.querySelectorAll('.wave-bar');
+
+        // Create audio element
+        const audioPlayer = new Audio();
+        audioPlayer.volume = 0.7;
+
+        // Initialize playlist UI
+        function initializePlaylist() {
+            playlistContainer.innerHTML = playlist.map((track, index) => `
+                <div class="playlist-item p-4 rounded-lg flex items-center justify-between ${index === currentTrackIndex ? 'currently-playing' : ''}" 
+                     data-index="${index}">
+                    <div>
+                        <h4 class="font-semibold">${track.title}</h4>
+                        <p class="text-sm text-gray-600">${track.artist}</p>
+                    </div>
+                    <span class="text-sm text-gray-500">${track.duration}</span>
+                </div>
+            `).join('');
+
+            // Add click event listeners to playlist items
+            document.querySelectorAll('.playlist-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    currentTrackIndex = parseInt(item.dataset.index);
+                    loadAndPlayTrack(currentTrackIndex);
+                });
+            });
+        }
+
+        // Load and play track
+        function loadAndPlayTrack(index) {
+            const track = playlist[index];
+            audioPlayer.src = track.audio;
+            albumCover.src = track.cover;
+            titleEl.textContent = track.title;
+            artistEl.textContent = track.artist;
+            
+            updatePlaylistHighlight();
+            audioPlayer.play().then(() => {
+                isPlaying = true;
+                updatePlayPauseButton();
+                albumCover.classList.add('playing');
+                startWaveAnimation();
+            }).catch(error => {
+                console.error('Playback failed:', error);
+            });
+        }
+
+        // Update playlist highlight
+        function updatePlaylistHighlight() {
+            document.querySelectorAll('.playlist-item').forEach((item, index) => {
+                item.classList.toggle('currently-playing', index === currentTrackIndex);
+            });
+        }
+
+        // Play/Pause toggle
+        playPauseBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                audioPlayer.pause();
+                albumCover.classList.remove('playing');
+                stopWaveAnimation();
+            } else {
+                audioPlayer.play();
+                albumCover.classList.add('playing');
+                startWaveAnimation();
+            }
+            isPlaying = !isPlaying;
+            updatePlayPauseButton();
+        });
+
+        // Update play/pause button
+        function updatePlayPauseButton() {
+            playPauseBtn.innerHTML = isPlaying ? `
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="white">
+                    <rect x="6" y="4" width="4" height="16"/>
+                    <rect x="14" y="4" width="4" height="16"/>
+                </svg>
+            ` : `
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="white">
+                    <path d="M8 5v14l11-7z"/>
+                </svg>
+            `;
+        }
+
+        // Wave animation
+        function startWaveAnimation() {
+            waveBars.forEach((bar, index) => {
+                const randomHeight = Math.floor(Math.random() * 24) + 8;
+                bar.style.height = `${randomHeight}px`;
+                bar.style.transition = 'height 0.2s';
+            });
+            waveAnimationInterval = setInterval(() => {
+                waveBars.forEach(bar => {
+                    const randomHeight = Math.floor(Math.random() * 24) + 8;
+                    bar.style.height = `${randomHeight}px`;
+                });
+            }, 200);
+        }
+
+        function stopWaveAnimation() {
+            clearInterval(waveAnimationInterval);
+            waveBars.forEach(bar => {
+                bar.style.height = '2px';
+            });
+        }
+
+        // Progress bar update
+        audioPlayer.addEventListener('timeupdate', () => {
+            const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+            progressBar.style.width = `${progress}%`;
+            currentTimeEl.textContent = formatTime(audioPlayer.currentTime);
+            durationEl.textContent = formatTime(audioPlayer.duration);
+        });
+
+        // Time formatting
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return "0:00";
+            const minutes = Math.floor(seconds / 60);
+            seconds = Math.floor(seconds % 60);
+            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Progress bar seek
+        const progressBarContainer = document.querySelector('.progress-bar');
+        progressBarContainer.addEventListener('click', (e) => {
+            const rect = progressBarContainer.getBoundingClientRect();
+            const pos = (e.clientX - rect.left) / rect.width;
+            audioPlayer.currentTime = pos * audioPlayer.duration;
+        });
+
+        // Next/Previous track
+        nextButton.addEventListener('click', () => {
+            currentTrackIndex = (currentTrackIndex + 1) % playlist.length;
+            loadAndPlayTrack(currentTrackIndex);
+        });
+
+        prevButton.addEventListener('click', () => {
+            currentTrackIndex = (currentTrackIndex - 1 + playlist.length) % playlist.length;
+            loadAndPlayTrack(currentTrackIndex);
+        });
+
+        // Auto-play next track when current track ends
+        audioPlayer.addEventListener('ended', () => {
+            currentTrackIndex = (currentTrackIndex + 1) % playlist.length;
+            loadAndPlayTrack(currentTrackIndex);
+        });
+
+        // Volume control
+        const volumeSlider = document.querySelector('.volume-slider');
+        volumeSlider.addEventListener('input', (e) => {
+            audioPlayer.volume = e.target.value / 100;
+        });
+
+        // Settings toggle
+        const settingsBtn = document.getElementById('settings-btn');
+        const settingsOverlay = document.getElementById('settings-overlay');
+        const closeSettings = document.getElementById('close-settings');
+
+        settingsBtn.addEventListener('click', () => {
+            settingsOverlay.classList.add('active');
+        });
+
+        closeSettings.addEventListener('click', () => {
+            settingsOverlay.classList.remove('active');
+        });
+
+        // Playlist toggle
+        const playlistOverlay = document.getElementById('playlist-overlay');
+        const closePlaylist = document.getElementById('close-playlist');
+        let startY = 0;
+        let currentY = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            startY = e.touches[0].clientY;
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            currentY = e.touches[0].clientY;
+            const diff = startY - currentY;
+            
+            if (diff > 50) {
+                playlistOverlay.classList.add('active');
+            } else if (diff < -50) {
+                playlistOverlay.classList.remove('active');
+            }
+        });
+
+        closePlaylist.addEventListener('click', () => {
+            playlistOverlay.classList.remove('active');
+        });
+
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case ' ':
+                    e.preventDefault();
+                    playPauseBtn.click();
+                    break;
+                case 'ArrowLeft':
+                    audioPlayer.currentTime -= 5;
+                    break;
+                case 'ArrowRight':
+                    audioPlayer.currentTime += 5;
+                    break;
+                case 'ArrowUp':
+                    audioPlayer.volume = Math.min(1, audioPlayer.volume + 0.1);
+                    volumeSlider.value = audioPlayer.volume * 100;
+                    break;
+                case 'ArrowDown':
+                    audioPlayer.volume = Math.max(0, audioPlayer.volume - 0.1);
+                    volumeSlider.value = audioPlayer.volume * 100;
+                    break;
+            }
+        });
+
+        // Initialize the player
+        initializePlaylist();
+        loadAndPlayTrack(currentTrackIndex);
+    </script>
+</body>
+</html>
