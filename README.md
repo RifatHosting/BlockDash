@@ -183,7 +183,7 @@
                 if (isVerified) {
                     successMessage.style.display = 'block';
                     setTimeout(() => {
-                        window.location.href = 'musicfy.html';
+                        window.location.href = 'hosou.html';
                     }, 2000);
                 } else {
                     errorMessage.style.display = 'block';
