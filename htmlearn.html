@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript Learning Player</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #3b82f6;
+            --background: #f8fafc;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --shadow-strong: rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --radius: 16px;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--background);
+            color: var(--text-primary);
+            line-height: 1.7;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            margin: 1rem;
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: 0 10px 40px var(--shadow);
+            position: relative;
+            overflow: hidden;
+            transform: translateY(0);
+            transition: var(--transition);
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px var(--shadow-strong);
+        }
+
+        .header {
+            padding: 2.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border-radius: var(--radius) var(--radius) 0 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: translate(30%, -30%);
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .progress-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: calc(var(--radius) - 4px);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .progress-bar {
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress {
+            width: 0%;
+            height: 100%;
+            background: white;
+            border-radius: 10px;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                rgba(255,255,255,0) 0%,
+                rgba(255,255,255,0.3) 50%,
+                rgba(255,255,255,0) 100%
+            );
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .lessons-container {
+            padding: 2rem;
+        }
+
+        .lesson {
+            display: none;
+            margin: 1.5rem 0;
+            padding: 2rem;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: 0 8px 30px var(--shadow);
+            transform: translateY(20px);
+            opacity: 0;
+            transition: var(--transition);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .lesson.active {
+            display: block;
+            animation: slideIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .lesson h2 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-weight: 600;
+        }
+
+        .lesson p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .lesson-content {
+            background: #f8fafc;
+            padding: 2rem;
+            border-radius: calc(var(--radius) - 4px);
+            margin: 1.5rem 0;
+            transition: var(--transition);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .lesson-content:hover {
+            transform: scale(1.01);
+            box-shadow: 0 8px 30px var(--shadow);
+        }
+
+        code {
+            font-family: 'Fira Code', monospace;
+            font-size: 1rem;
+            line-height: 1.6;
+            display: block;
+            color: #334155;
+        }
+
+        code::before {
+            content: '// Code Example';
+            display: block;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-style: italic;
+            margin-bottom: 1rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: calc(var(--radius) - 4px);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background: #e2e8f0;
+            color: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .completion-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background: var(--card-bg);
+            padding: 3rem;
+            border-radius: var(--radius);
+            text-align: center;
+            z-index: 1001;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            max-width: 90%;
+            width: 450px;
+            box-shadow: 0 20px 60px var(--shadow-strong);
+        }
+
+        .modal-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .completion-modal.active {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .completion-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 2rem;
+            animation: celebrateIcon 1.2s ease-out;
+        }
+
+        @keyframes celebrateIcon {
+            0% { transform: scale(0) rotate(-180deg); }
+            60% { transform: scale(1.2) rotate(10deg); }
+            100% { transform: scale(1) rotate(0); }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem 0.5rem;
+            }
+
+            .container {
+                margin: 0.5rem;
+                border-radius: calc(var(--radius) - 4px);
+            }
+
+            .header {
+                padding: 2rem 1.5rem;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .lessons-container {
+                padding: 1rem;
+            }
+
+            .lesson {
+                padding: 1.5rem;
+                margin: 1rem 0;
+            }
+
+            .lesson h2 {
+                font-size: 1.3rem;
+            }
+
+            .lesson p {
+                font-size: 1rem;
+            }
+
+            .lesson-content {
+                padding: 1.5rem;
+            }
+
+            code {
+                font-size: 0.9rem;
+                overflow-x: auto;
+            }
+
+            button {
+                padding: 0.8rem 1.5rem;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .completion-modal {
+                padding: 2rem;
+                width: calc(100% - 2rem);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .lesson {
+                padding: 1.2rem;
+            }
+
+            .lesson-content {
+                padding: 1.2rem;
+            }
+
+            code {
+                font-size: 0.85rem;
+            }
+
+            .completion-icon {
+                width: 80px;
+                height: 80px;
+                margin-bottom: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Belajar HTML Dasar</h1>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress" id="progress"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="lessons-container">
+            <div class="lesson active" id="lesson1">
+                <h2>🔤 Pengertian HTML</h2>
+                <p>HTML (HyperText Markup Language) adalah bahasa standar yang digunakan untuk membuat halaman web. HTML memungkinkan kita membuat struktur dan konten pada web, seperti teks, gambar, dan tautan.</p>
+                <div class="lesson-content">
+                    <code>
+                        <!-- Struktur dasar HTML -->
+                        &lt;!DOCTYPE html&gt;
+                        &lt;html&gt;
+                        &lt;head&gt;
+                            &lt;title&gt;Judul Halaman&lt;/title&gt;
+                        &lt;/head&gt;
+                        &lt;body&gt;
+                            &lt;h1&gt;Selamat datang di HTML!&lt;/h1&gt;
+                            &lt;p&gt;Ini adalah paragraf contoh.&lt;/p&gt;
+                        &lt;/body&gt;
+                        &lt;/html&gt;
+                    </code>
+                </div>
+                <button onclick="completeLesson(1)">Saya Sudah Mengerti</button>
+            </div>
+
+            <div class="lesson" id="lesson2">
+                <h2>📋 Elemen dan Tag HTML</h2>
+                <p>HTML terdiri dari elemen-elemen yang ditulis menggunakan tag. Tag memiliki bentuk seperti &lt;tag&gt; dan &lt;/tag&gt;, contohnya &lt;p&gt; untuk paragraf.</p>
+                <div class="lesson-content">
+                    <code>
+                        <!-- Elemen paragraf -->
+                        &lt;p&gt;Ini adalah teks dalam paragraf.&lt;/p&gt;
+
+                        <!-- Elemen header -->
+                        &lt;h1&gt;Header 1&lt;/h1&gt;
+                        &lt;h2&gt;Header 2&lt;/h2&gt;
+
+                        <!-- Elemen link -->
+                        &lt;a href="https://contoh.com"&gt;Klik di sini&lt;/a&gt;
+                    </code>
+                </div>
+                <button onclick="completeLesson(2)">Saya Sudah Mengerti</button>
+            </div>
+
+            <div class="lesson" id="lesson3">
+                <h2>🔗 Atribut HTML</h2>
+                <p>Atribut memberikan informasi tambahan pada elemen HTML. Contohnya, atribut `href` pada elemen &lt;a&gt; menentukan tujuan tautan.</p>
+                <div class="lesson-content">
+                    <code>
+                        <!-- Contoh atribut pada elemen link -->
+                        &lt;a href="https://example.com" target="_blank"&gt;Buka Halaman&lt;/a&gt;
+
+                        <!-- Elemen gambar dengan atribut src dan alt -->
+                        &lt;img src="gambar.jpg" alt="Deskripsi gambar"&gt;
+                    </code>
+                </div>
+                <button onclick="completeLesson(3)">Saya Sudah Mengerti</button>
+            </div>
+
+            <div class="lesson" id="lesson4">
+                <h2>📂 Struktur Dokumen dan Layout</h2>
+                <p>Kita bisa mengatur struktur halaman menggunakan elemen-elemen seperti &lt;header&gt;, &lt;nav&gt;, &lt;section&gt;, &lt;article&gt;, dan &lt;footer&gt;.</p>
+                <div class="lesson-content">
+                    <code>
+                        <!-- Contoh struktur layout dasar -->
+                        &lt;header&gt;
+                            &lt;h1&gt;Judul Situs&lt;/h1&gt;
+                        &lt;/header&gt;
+
+                        &lt;nav&gt;
+                            &lt;ul&gt;
+                                &lt;li&gt;&lt;a href="#home"&gt;Home&lt;/a&gt;&lt;/li&gt;
+                                &lt;li&gt;&lt;a href="#about"&gt;Tentang&lt;/a&gt;&lt;/li&gt;
+                            &lt;/ul&gt;
+                        &lt;/nav&gt;
+
+                        &lt;section&gt;
+                            &lt;h2&gt;Konten Utama&lt;/h2&gt;
+                            &lt;p&gt;Ini adalah contoh konten utama.&lt;/p&gt;
+                        &lt;/section&gt;
+
+                        &lt;footer&gt;
+                            &lt;p&gt;Hak Cipta 2024&lt;/p&gt;
+                        &lt;/footer&gt;
+                    </code>
+                </div>
+                <button onclick="completeLesson(4)">Saya Sudah Mengerti</button>
+            </div>
+
+            <div class="lesson" id="lesson5">
+                <h2>⚡ Formulir dan Input</h2>
+                <p>Formulir memungkinkan pengguna untuk mengirim data ke server. Elemen input digunakan untuk menerima masukan dari pengguna.</p>
+                <div class="lesson-content">
+                    <code>
+                        <!-- Contoh formulir dasar -->
+                        &lt;form action="/submit" method="post"&gt;
+                            &lt;label for="nama"&gt;Nama:&lt;/label&gt;
+                            &lt;input type="text" id="nama" name="nama"&gt;
+
+                            &lt;label for="email"&gt;Email:&lt;/label&gt;
+                            &lt;input type="email" id="email" name="email"&gt;
+
+                            &lt;button type="submit"&gt;Kirim&lt;/button&gt;
+                        &lt;/form&gt;
+                    </code>
+                </div>
+                <button onclick="completeLesson(5)">Saya Sudah Mengerti</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="completion-modal" id="completionModal">
+            <svg class="completion-icon" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" fill="none" stroke="#2563eb" stroke-width="2"/>
+                <path d="M30,50 L45,65 L70,35" fill="none" stroke="#2563eb" stroke-width="3"/>
+            </svg>
+            <h2 style="color: var(--text-primary); font-size: 1.8rem; margin-bottom: 1rem">🎉 Selamat!</h2>
+            <p style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 1rem">
+                Anda telah menyelesaikan pembelajaran html Dasar dengan baik!
+            </p>
+            <p style="color: var(--text-secondary); font-size: 1.1rem; margin: 1rem 0">
+                Siap untuk menguji pemahaman Anda?
+            </p>
+            <button onclick="redirectToHTML()" style="width: 100%; justify-content: center; margin-top: 1rem">
+                Mulai Tes
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let currentLesson = 1;
+        let completedLessons = 0;
+        
+        function completeLesson(lessonNumber) {
+            const button = document.querySelector(`#lesson${lessonNumber} button`);
+            button.disabled = true;
+            button.innerHTML = `
+                Selesai! 
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 13l4 4L19 7"></path>
+                </svg>
+            `;
+            
+            completedLessons++;
+            updateProgress();
+            
+            if (completedLessons < 5) {
+                setTimeout(() => {
+                    currentLesson++;
+                    const nextLesson = document.querySelector(`#lesson${currentLesson}`);
+                    nextLesson.classList.add('active');
+                    nextLesson.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'start',
+                        inline: 'nearest'
+                    });
+                }, 800);
+            } else {
+                setTimeout(showCompletionModal, 1000);
+            }
+        }
+        
+        function updateProgress() {
+            const progress = (completedLessons / 5) * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
+        }
+        
+        function showCompletionModal() {
+            const overlay = document.getElementById('modalOverlay');
+            const modal = document.getElementById('completionModal');
+            overlay.classList.add('active');
+            setTimeout(() => modal.classList.add('active'), 100);
+        }
+        
+        function redirectToHTML() {
+            window.location.href = 'quiz.html';
+        }
+
+        // Improved modal handling
+        document.getElementById('modalOverlay').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('modalOverlay')) {
+                const overlay = document.getElementById('modalOverlay');
+                const modal = document.getElementById('completionModal');
+                modal.classList.remove('active');
+                setTimeout(() => overlay.classList.remove('active'), 300);
+            }
+        });
+
+        // Add keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const overlay = document.getElementById('modalOverlay');
+                const modal = document.getElementById('completionModal');
+                if (overlay.classList.contains('active')) {
+                    modal.classList.remove('active');
+                    setTimeout(() => overlay.classList.remove('active'), 300);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
